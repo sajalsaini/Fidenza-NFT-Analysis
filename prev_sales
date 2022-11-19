@@ -1,0 +1,8 @@
+-- Identify the previous sales of the highest priced NFT along with prices in USD and ETH
+
+select date_trunc(day, created_at_timestamp) as sale_date, price as price_eth, price_usd, m.token_name
+	from ethereum.core.ez_nft_sales s -- nft sale table
+	join ethereum.core.dim_nft_metadata m on s.tokenid = m.token_id --mint addresses from both tables should be the same
+where m.token_name ilike '%fidenza #313%'-- SOL-based NFT marketplace
+order by price_eth
+limit 1
