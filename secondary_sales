@@ -1,0 +1,9 @@
+-- Identifying the secondary sales of NFTs in the Fidenza project and the commission (in ETH and USD) the artist/ creator got from that sale
+
+select date_trunc(day, sales.block_timestamp), meta.creator_name,meta.project_name,sum(sales.total_fees) as Secondary_sale_eth, sum(sales.total_fees_usd) as Secondry_sales_USD, sum(sales.creator_fee) as Commission_eth, sum(sales.creator_fee_usd) as  Commission_USD, sales.platform_name
+    from ethereum.core.dim_nft_metadata meta, ethereum.core.ez_nft_sales sales
+      where meta.token_name like ('fidenza%')
+    and sales.tokenid = meta.token_id
+    and sales.platform_name like ('opensea') and
+  	sales.block_timestamp between '{{start_date}}' AND '{{end_date}}'
+    group by  sales.platform_name, meta.project_name, meta.creator_name, sales.block_timestamp
