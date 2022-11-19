@@ -1,0 +1,8 @@
+-- Identifying the highest priced NFT in the Fidenza project
+
+select left(created_at_timestamp, 10) as creation_date, price as price_eth, s.price_usd, s.project_name, m.token_name, s.buyer_address, s.tokenid
+	from ethereum.core.ez_nft_sales s 
+	join ethereum.core.dim_nft_metadata m on s.tokenid = m.token_id
+where m.token_name ilike '%fidenza%'  and s.currency_symbol = 'ETH'
+order by price_eth DESC 
+limit 1
