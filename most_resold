@@ -1,0 +1,17 @@
+-- Idetifying the NFTs that has been resold the most along with the average holding time in the Fidenza project
+
+WITH holding as (
+SELECT
+tokenid, lag(block_timestamp, 1)  over (partition by tokenid order by block_timestamp asc) as purchase_date,
+datediff('hour', purchase_date , block_timestamp) as holding_time
+FROM ethereum.core.ez_nft_sales)
+  
+SELECT s.tokenid, count(s.block_timestamp) as resold_count, avg(h.holding_time) as avg_holding_time_hr, m.image_url, m.token_name
+    FROM ethereum.core.dim_nft_metadata m, ethereum.core.ez_nft_sales s, holding h
+    WHERE m.project_name like ('%art%blocks')
+    AND m.token_name like ('%fidenza%')
+    AND s.tokenid = m.token_id
+    AND s.tokenid = h.tokenid
+    AND s.event_type = 'sale'
+    GROUP BY s.tokenid, m.image_url, m.token_name
+    ORDER BY resold_count DESC;
